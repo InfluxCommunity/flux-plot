@@ -1,0 +1,63 @@
+# main.py
+import argparse
+import influxdb_client
+import matplotlib.pyplot as plt, mpld3
+
+args_parser = argparse.ArgumentParser(
+    prog="flux_plot", description='Retrieve and plot results from InfluxDB',add_help=True)
+args_parser.add_argument('-f',
+                       '--file',
+                       required=False,
+                       help='read flux query from file')
+
+args_parser.add_argument('-q',
+                       '--query',
+                       required=False,
+                       help='query to execute, ignored if supplied via file (-f, --file) argument')
+
+args_parser.add_argument('-t',
+                       '--token',
+                       required=True,
+                       help='read token for InfluxDB accoubnt')
+args_parser.add_argument('-o',
+                       '--organization',
+                       required=True,
+                       help='org name for InfluxDB account')
+args_parser.add_argument('-u',
+                       '--host',
+                       required=True,
+                       help='URL for InfluxDB account')
+
+args = args_parser.parse_args()
+
+if args.file == None and args.query == None:
+    print("No query supplied")
+    exit(0)
+
+if args.file != None:
+    query = open(args.file, 'r').read()
+
+else:
+     query = args.query
+
+client = influxdb_client.InfluxDBClient(
+   url = args.host,
+   token = args.token,
+   org = args.organization
+)
+query_api = client.query_api()
+
+result = query_api.query(query, org=args.organization)
+fig = plt.figure()
+for table in result:
+    x_vals = []
+    y_vals = []
+    label = ""
+    
+    for record in table:
+        y_vals.append(record["_value"])
+        x_vals.append(record["_time"])
+    plt.plot(x_vals, y_vals, label=label)
+
+plt.legend()
+plt.show()
