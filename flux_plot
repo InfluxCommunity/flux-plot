@@ -42,6 +42,18 @@ args_parser.add_argument('-s',
                          '--save',
                          required=False,
                          help='Output file name. If ommitted, no file will be created.',)
+                        
+args_parser.add_argument('--xaxis',
+                         required=False,
+                         help='X axis label',)
+
+args_parser.add_argument('--yaxis',
+                         required=False,
+                         help='Y axis label',)
+
+args_parser.add_argument('--title',
+                         required=False,
+                         help='Title',)
 
 args = args_parser.parse_args()
 
@@ -57,6 +69,7 @@ else:
 
 if args.verbose != None:
     print("query to execute: {}".format(query))
+    print("X axis label: {}, Y axis label: {}, title: {}".format(args.xaxis, args.yaxis, args.title))
 
 client = influxdb_client.InfluxDBClient(
     url=args.host,
@@ -68,6 +81,17 @@ query_api = client.query_api()
 result = query_api.query(query, org=args.organization)
 
 fig = plt.figure()
+
+if args.xaxis != None:
+    plt.xlabel(args.xaxis)
+
+if args.yaxis != None:
+    plt.ylabel(args.yaxis)
+
+if args.title != None:
+    plt.title(args.title)
+
+plt.xlabel
 for table in result:
     x_vals = []
     y_vals = []
