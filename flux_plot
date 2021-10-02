@@ -31,8 +31,8 @@ args_parser.add_argument('-u',
                          required=True,
                          help='URL for InfluxDB account')
 
-args_parser.add_argument('-p',
-                         '--printdata',
+args_parser.add_argument('-v',
+                         '--verbose',
                          nargs='?',
                          const=1,
                          required=False,
@@ -67,7 +67,7 @@ for table in result:
     label = ""
 
     for record in table:
-        if args.printdata != None:
+        if args.verbose != None:
             print(record)
         y_vals.append(record["_value"])
         x_vals.append(record["_time"])
