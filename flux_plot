@@ -31,6 +31,13 @@ args_parser.add_argument('-u',
                          required=True,
                          help='URL for InfluxDB account')
 
+args_parser.add_argument('-p',
+                         '--printdata',
+                         nargs='?',
+                         const=1,
+                         required=False,
+                         help='Also print raw Python records to standard out',)
+
 args = args_parser.parse_args()
 
 if args.file == None and args.query == None:
@@ -50,7 +57,9 @@ client = influxdb_client.InfluxDBClient(
 )
 query_api = client.query_api()
 
+
 result = query_api.query(query, org=args.organization)
+
 fig = plt.figure()
 for table in result:
     x_vals = []
@@ -58,9 +67,13 @@ for table in result:
     label = ""
 
     for record in table:
+        if args.printdata != None:
+            print(record)
         y_vals.append(record["_value"])
         x_vals.append(record["_time"])
     plt.plot(x_vals, y_vals, label=label)
 
 plt.legend()
 plt.show()
+
+
