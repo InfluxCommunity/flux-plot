@@ -4,18 +4,19 @@ Uses the InfluxDB Python library and matlplotlib to visualize queries
 # Usage
 Assumimg that you have written  a flux query in a file called query.flux, use -f to specify the file:
 ```
-$./flux_plot -t $INFLUXDB_TOKEN -o "rick@influxdata.com" -u "https://us-west-2-1.aws.cloud2.influxdata.com/" -f query.flux
+$ ./flux_plot -t $INFLUXDB_TOKEN -o $INFLUX_ORG -u "https://us-west-2-1.aws.cloud2.influxdata.com/" -f query.flux -v -s graph.png
 ```
 Or you can supply a query directly with -q:
 
 ```
-$ ./flux_plot -t $INFLUXDB_TOKEN -o "rick@influxdata.com" -u "https://us-west-2-1.aws.cloud2.influxdata.com/" -q "from(bucket: \"operating-results\") |> range(start: -24h) |> filter(fn: (r) => r[\"_measurement\"] == \"read\")"
+$ ./flux_plot -t $INFLUXDB_TOKEN -o $INFLUX_ORG -u "https://us-west-2-1.aws.cloud2.influxdata.com/" -v -s graph.png -q "from(bucket: \"operating-results\") |> range(start: -24h) |> filter(fn: (r) => r[\"_measurement\"] == \"read\")"
 ```
 
 
 # Help
 ```
-flux_plot -husage: flux_plot [-h] [-f FILE] [-q QUERY] -t TOKEN -o ORGANIZATION -u HOST
+$ ./flux_plot -h
+usage: flux_plot [-h] [-f FILE] [-q QUERY] -t TOKEN -o ORGANIZATION -u HOST [-v [VERBOSE]] [-s SAVE]
 
 Retrieve and plot results from InfluxDB
 
@@ -29,10 +30,12 @@ optional arguments:
   -o ORGANIZATION, --organization ORGANIZATION
                         org name for InfluxDB account
   -u HOST, --host HOST  URL for InfluxDB account
+  -v [VERBOSE], --verbose [VERBOSE]
+                        Also print raw Python records to standard out
+  -s SAVE, --save SAVE  Output file name. If ommitted, no file will be created.
   ```
 
 # Gonna need some modules
-
 ```
 pip3 install influxdb_client matplotlib
 ```
