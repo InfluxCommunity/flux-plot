@@ -40,6 +40,8 @@ optional arguments:
                         Collumn to use in legend
   --height HEIGHT       Figure height (in inches)
   --width WIDTH         Figure width (in inches)
+  --no-display [NO_DISPLAY]
+                        Skip displaying the graph interactively
   ```
 
 # Gonna need some modules

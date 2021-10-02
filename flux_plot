@@ -68,10 +68,20 @@ args_parser.add_argument('--width',
                          required=False,
                          help='Figure width (in inches)',)
 
+args_parser.add_argument('--no-display',
+                         nargs='?',
+                         const=1,
+                         required=False,
+                         help='Skip displaying the graph interactively',)
+
 args = args_parser.parse_args()
 
 if args.file == None and args.query == None:
     print("No query supplied")
+    exit(0)
+
+if args.no_display != None and args.save == None:
+    print("Skipping display and no save file specified")
     exit(0)
 
 if args.file != None:
@@ -133,9 +143,10 @@ if args.legend_col != None:
 if args.save != None:
     if args.verbose != None:
         print("Saving to file: {}".format(args.save) )
-        plt.savefig(args.save)
+    plt.savefig(args.save)
 
-plt.show()
+if args.no_display == None:
+    plt.show()
 
 
 
