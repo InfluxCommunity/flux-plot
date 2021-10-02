@@ -38,6 +38,11 @@ args_parser.add_argument('-v',
                          required=False,
                          help='Also print raw Python records to standard out',)
 
+args_parser.add_argument('-s',
+                         '--save',
+                         required=False,
+                         help='Output file name. If ommitted, no file will be created.',)
+
 args = args_parser.parse_args()
 
 if args.file == None and args.query == None:
@@ -50,13 +55,15 @@ if args.file != None:
 else:
     query = args.query
 
+if args.verbose != None:
+    print("query to execute: {}".format(query))
+
 client = influxdb_client.InfluxDBClient(
     url=args.host,
     token=args.token,
     org=args.organization
 )
 query_api = client.query_api()
-
 
 result = query_api.query(query, org=args.organization)
 
@@ -74,6 +81,13 @@ for table in result:
     plt.plot(x_vals, y_vals, label=label)
 
 plt.legend()
+
+if args.save != None:
+    if args.verbose != None:
+        print("Saving to file: {}".format(args.save) )
+        plt.savefig(args.save)
+
 plt.show()
+
 
 
