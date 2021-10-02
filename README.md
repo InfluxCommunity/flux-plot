@@ -38,6 +38,8 @@ optional arguments:
   --title TITLE         Title
     -l LEGEND_COL, --legend-col LEGEND_COL
                         Collumn to use in legend
+  --height HEIGHT       Figure height (in inches)
+  --width WIDTH         Figure width (in inches)
   ```
 
 # Gonna need some modules

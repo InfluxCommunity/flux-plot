@@ -60,6 +60,14 @@ args_parser.add_argument('-l',
                          required=False,
                          help='Collumn to use in legend',)
 
+args_parser.add_argument('--height',
+                         required=False,
+                         help='Figure height (in inches)',)
+
+args_parser.add_argument('--width',
+                         required=False,
+                         help='Figure width (in inches)',)
+
 args = args_parser.parse_args()
 
 if args.file == None and args.query == None:
@@ -74,7 +82,9 @@ else:
 
 if args.verbose != None:
     print("query to execute: {}".format(query))
+    print()
     print(args)
+    print()
 
 client = influxdb_client.InfluxDBClient(
     url=args.host,
@@ -86,6 +96,12 @@ query_api = client.query_api()
 result = query_api.query(query, org=args.organization)
 
 fig = plt.figure()
+
+if args.height !=None:
+    fig.set_figheight(int(args.height))
+
+if args.width !=None:
+    fig.set_figwidth(int(args.width))
 
 if args.xaxis != None:
     plt.xlabel(args.xaxis)
