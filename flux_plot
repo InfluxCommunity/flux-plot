@@ -55,6 +55,11 @@ args_parser.add_argument('--title',
                          required=False,
                          help='Title',)
 
+args_parser.add_argument('-l',
+                        '--legend-col',
+                         required=False,
+                         help='Collumn to use in legend',)
+
 args = args_parser.parse_args()
 
 if args.file == None and args.query == None:
@@ -69,7 +74,7 @@ else:
 
 if args.verbose != None:
     print("query to execute: {}".format(query))
-    print("X axis label: {}, Y axis label: {}, title: {}".format(args.xaxis, args.yaxis, args.title))
+    print(args)
 
 client = influxdb_client.InfluxDBClient(
     url=args.host,
@@ -102,9 +107,12 @@ for table in result:
             print(record)
         y_vals.append(record["_value"])
         x_vals.append(record["_time"])
+        if args.legend_col != None:
+            label = record[args.legend_col]
     plt.plot(x_vals, y_vals, label=label)
 
-plt.legend()
+if args.legend_col != None:
+    plt.legend()
 
 if args.save != None:
     if args.verbose != None:

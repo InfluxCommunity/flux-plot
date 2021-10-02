@@ -31,8 +31,13 @@ optional arguments:
                         org name for InfluxDB account
   -u HOST, --host HOST  URL for InfluxDB account
   -v [VERBOSE], --verbose [VERBOSE]
-                        Also print raw Python records to standard out
+                        Print debugging info to std-out
   -s SAVE, --save SAVE  Output file name. If ommitted, no file will be created.
+  --xaxis XAXIS         X axis label
+  --yaxis YAXIS         Y axis label
+  --title TITLE         Title
+    -l LEGEND_COL, --legend-col LEGEND_COL
+                        Collumn to use in legend
   ```
 
 # Gonna need some modules
