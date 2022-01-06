@@ -123,28 +123,34 @@ if args.title != None:
     plt.title(args.title)
 
 plt.xlabel
-for table in result:
+
+def plot_table(table):
     x_vals = []
     y_vals = []
     label = ""
-    is_profiler_table = False
-    for record in table:
-        if args.verbose != None:
-            print(record)
-        
+
+    for record in table.records:
+        y_vals.append(record["_value"])
+        x_vals.append(record["_time"])
+        if args.legend_col != None:
+            label = record[args.legend_col]
+
+    plt.plot(x_vals, y_vals, label=label)
+
+for table in result:
+    if len(table.records) > 0:
+        #make sure this is not a profiler table
+        # legit tables don't require a measurement, so pass on KeyError
+
+        profiler_table = False
         try:
-            if record.get_measurement() == "profiler/query" or record.get_measurement() == "profiler/operator":
-                is_profiler_table = True
+            if table.records[0].get_measurement() == "profiler/query" or table.records[0].get_measurement() == "profiler/operator":
+                profiler_table = True
         except KeyError:
             pass
 
-        if not is_profiler_table:
-            y_vals.append(record["_value"])
-            x_vals.append(record["_time"])
-            if args.legend_col != None:
-                label = record[args.legend_col]
-
-    plt.plot(x_vals, y_vals, label=label)
+        if not profiler_table:  
+            plot_table(table)
 
 if args.legend_col != None:
     plt.legend()
