@@ -22,6 +22,7 @@ args_parser.add_argument('-t',
                          '--token',
                          required=True,
                          help='read token for InfluxDB accoubnt')
+
 args_parser.add_argument('-o',
                          '--organization',
                          required=True,
@@ -38,10 +39,12 @@ args_parser.add_argument('-v',
                          required=False,
                          help='Also print raw Python records to standard out',)
 
-args_parser.add_argument('-s',
-                         '--save',
+args_parser.add_argument('-n',
+                         '--output-name',
+                         type=str,
+                         default="results",
                          required=False,
-                         help='Output file name. If ommitted, no file will be created.',)
+                         help='String to use when creating file names. If ommitted, \"results\" will be used. Output files will be in the form of ${output_name}_data.png',)
                         
 args_parser.add_argument('--xaxis',
                          required=False,
@@ -58,7 +61,7 @@ args_parser.add_argument('--title',
 args_parser.add_argument('-l',
                         '--legend-col',
                          required=False,
-                         help='Collumn to use in legend',)
+                         help='Collumn to use in legend of the graph for the data',)
 
 args_parser.add_argument('--height',
                          required=False,
@@ -68,20 +71,11 @@ args_parser.add_argument('--width',
                          required=False,
                          help='Figure width (in inches)',)
 
-args_parser.add_argument('--no-display',
-                         nargs='?',
-                         const=1,
-                         required=False,
-                         help='Skip displaying the graph interactively',)
-
 args = args_parser.parse_args()
+
 
 if args.file == None and args.query == None:
     print("No query supplied")
-    exit(0)
-
-if args.no_display != None and args.save == None:
-    print("Skipping display and no save file specified")
     exit(0)
 
 if args.file != None:
@@ -124,44 +118,48 @@ if args.title != None:
 
 plt.xlabel
 
-def plot_table(table):
-    x_vals = []
-    y_vals = []
-    label = ""
+def plot_data_tables(tables):
+    for table in tables:
+        if(args.verbose != None):
+            print(table)
+            print()
 
-    for record in table.records:
-        y_vals.append(record["_value"])
-        x_vals.append(record["_time"])
-        if args.legend_col != None:
-            label = record[args.legend_col]
+        x_vals = []
+        y_vals = []
+        label = ""
 
-    plt.plot(x_vals, y_vals, label=label)
+        for record in table.records:
+            y_vals.append(record["_value"])
+            x_vals.append(record["_time"])
+            if args.legend_col != None:
+                label = record[args.legend_col]
+
+        plt.plot(x_vals, y_vals, label=label)
+    if args.legend_col != None:
+        plt.legend()
+
+    plt.savefig(f"{args.output_name}_data.png")
+    
+data_tables = []
+profiler_tables = []
 
 for table in result:
+    data_table = True
     if len(table.records) > 0:
         #make sure this is not a profiler table
         # legit tables don't require a measurement, so pass on KeyError
-
-        profiler_table = False
         try:
             if table.records[0].get_measurement() == "profiler/query" or table.records[0].get_measurement() == "profiler/operator":
-                profiler_table = True
+                profiler_tables.append(table)
+                data_table = False
+                
         except KeyError:
             pass
-
-        if not profiler_table:  
-            plot_table(table)
-
-if args.legend_col != None:
-    plt.legend()
-
-if args.save != None:
-    if args.verbose != None:
-        print("Saving to file: {}".format(args.save) )
-    plt.savefig(args.save)
-
-if args.no_display == None:
-    plt.show()
-
+        if data_table:
+            data_tables.append(table)
+if(args.verbose != None):
+    print(f"${len(data_tables)} data tables found")
+    print(f"${len(profiler_tables)} profiler results tables found")
+plot_data_tables(data_tables)
 
 
